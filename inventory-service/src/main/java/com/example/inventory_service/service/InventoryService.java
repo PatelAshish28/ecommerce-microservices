@@ -1,28 +1,25 @@
 package com.example.inventory_service.service;
 
+import com.example.inventory_service.client.ProductClient;
 import com.example.inventory_service.dto.InventoryRequest;
 import com.example.inventory_service.dto.InventoryResponse;
+import com.example.inventory_service.dto.ProductResponse;
 import com.example.inventory_service.entity.Inventory;
 import com.example.inventory_service.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
 
-    public InventoryResponse createInventory(InventoryRequest request) {
+    private final ProductClient productClient;
 
-        Inventory inventory = Inventory.builder()
-                .productId(request.productId())
-                .quantity(request.quantity())
-                .build();
-
-        Inventory saved = inventoryRepository.save(inventory);
-
-        return mapToResponse(saved);
+    public InventoryService(InventoryRepository inventoryRepository, ProductClient productClient) {
+        this.inventoryRepository = inventoryRepository;
+        this.productClient = productClient;
     }
 
     public InventoryResponse getByProductId(Long productId) {
@@ -43,4 +40,21 @@ public class InventoryService {
                 inventory.getQuantity()
         );
     }
+
+    public InventoryResponse createInventory(InventoryRequest request) {
+
+        ProductResponse product =
+                productClient.getProductById(request.productId());
+
+        Inventory inventory = Inventory.builder()
+                .productId(product.id())
+                .quantity(request.quantity())
+                .build();
+
+        Inventory saved = inventoryRepository.save(inventory);
+
+        return mapToResponse(saved);
+    }
+
+
 }

@@ -3,6 +3,7 @@ package com.ecommerce.product_service.service;
 import com.ecommerce.product_service.dto.ProductRequest;
 import com.ecommerce.product_service.dto.ProductResponse;
 import com.ecommerce.product_service.entity.Product;
+import com.ecommerce.product_service.exception.ProductNotFoundException;
 import com.ecommerce.product_service.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,15 @@ public class ProductService {
                 product.getPrice(),
                 product.getCategory()
         );
+    }
+
+    public ProductResponse getProductById(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() ->
+                        new ProductNotFoundException(id));
+
+        return mapToResponse(product);
     }
 
 }
