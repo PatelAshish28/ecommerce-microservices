@@ -5,4 +5,6 @@ public record InventoryResponse(
         Long productId,
         Integer quantity
 ) {
+
+
 }

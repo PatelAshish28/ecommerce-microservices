@@ -12,14 +12,11 @@ public class ProductClient {
 
     private final RestClient restClient;
 
-    @Value("${services.product.url}")
-    private String productServiceUrl;
-
     public ProductResponse getProductById(Long productId) {
 
         return restClient
                 .get()
-                .uri(productServiceUrl + "/api/products/{id}", productId)
+                .uri("http://product-service/api/products/{id}", productId)
                 .retrieve()
                 .body(ProductResponse.class);
     }

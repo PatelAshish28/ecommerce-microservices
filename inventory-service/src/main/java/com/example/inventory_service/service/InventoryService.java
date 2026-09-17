@@ -6,8 +6,6 @@ import com.example.inventory_service.dto.InventoryResponse;
 import com.example.inventory_service.dto.ProductResponse;
 import com.example.inventory_service.entity.Inventory;
 import com.example.inventory_service.repository.InventoryRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
