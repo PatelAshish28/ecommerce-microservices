@@ -1,6 +1,7 @@
 package com.example.inventory_service.client;
 
 import com.example.inventory_service.dto.ProductResponse;
+import com.example.inventory_service.exception.ProductServiceUnavailableException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +30,7 @@ public class ProductClient {
             Long productId,
             Throwable throwable) {
 
-        throw new RuntimeException(
+        throw new ProductServiceUnavailableException(
                 "Product service is currently unavailable"
         );
     }
