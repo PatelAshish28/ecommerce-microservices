@@ -1,5 +1,6 @@
 package com.example.order_service.service;
 
+import com.example.order_service.client.InventoryClient;
 import com.example.order_service.client.ProductClient;
 import com.example.order_service.dto.OrderRequest;
 import com.example.order_service.dto.OrderResponse;
@@ -20,13 +21,21 @@ public class OrderService {
 
     private final ProductClient productClient;
 
+    private final InventoryClient inventoryClient;
+
     public OrderResponse createOrder(OrderRequest request) {
 
+        //1.Check Product
         ProductResponse product = productClient.getProductById(request.productId());
 
+        //2.Calculate Total Price
         BigDecimal totalPrice = product.price()
                 .multiply(BigDecimal.valueOf(request.quantity()));
 
+        //3.Reserve Inventory
+        inventoryClient.reserveStock(request.productId(), request.quantity());
+
+        //4.Create Order
         Order order = Order.builder()
                 .productId(request.productId())
                 .quantity(request.quantity())
@@ -34,6 +43,7 @@ public class OrderService {
                 .status(OrderStatus.CREATED)
                 .build();
 
+        //5.Save Order
         Order savedOrder = orderRepository.save(order);
 
         return new OrderResponse(

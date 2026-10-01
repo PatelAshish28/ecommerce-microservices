@@ -2,10 +2,12 @@ package com.example.inventory_service.controller;
 
 import com.example.inventory_service.dto.InventoryRequest;
 import com.example.inventory_service.dto.InventoryResponse;
+import com.example.inventory_service.dto.ReserveInventoryRequest;
 import com.example.inventory_service.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,5 +30,18 @@ public class InventoryController {
             @PathVariable Long productId) {
 
         return inventoryService.getByProductId(productId);
+    }
+
+    @PostMapping("/{productId}/reserve")
+    public ResponseEntity<InventoryResponse> reserveStock(
+            @PathVariable Long productId,
+            @Valid @RequestBody ReserveInventoryRequest request) {
+
+        return ResponseEntity.ok(
+                inventoryService.reserveStock(
+                        productId,
+                        request.quantity()
+                )
+        );
     }
 }

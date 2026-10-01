@@ -31,4 +31,23 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+//    @ExceptionHandler(ProductServiceUnavailableException.class)
+//    public ResponseEntity<ErrorResponse> InsufficientStockException(
+//            InsufficientStockException exception,
+//            HttpServletRequest request
+//    ){
+//
+//        ErrorResponse response=new ErrorResponse(
+//                LocalDateTime.now(),
+//                HttpStatus.NOT_ACCEPTABLE.value(),
+//                "STOCK_INSUFFICIENT",
+//                exception.getMessage(),
+//                request.getRequestURI()
+//        );
+//
+//        return ResponseEntity
+//                .status(HttpStatus.NOT_ACCEPTABLE)
+//                .body(response);
+//    }
+
 }

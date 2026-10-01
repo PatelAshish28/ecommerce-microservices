@@ -5,7 +5,10 @@ import com.example.inventory_service.dto.InventoryRequest;
 import com.example.inventory_service.dto.InventoryResponse;
 import com.example.inventory_service.dto.ProductResponse;
 import com.example.inventory_service.entity.Inventory;
+import com.example.inventory_service.exception.InsufficientStockException;
+import com.example.inventory_service.exception.InventoryNotFound;
 import com.example.inventory_service.repository.InventoryRepository;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -54,6 +57,26 @@ public class InventoryService {
         return mapToResponse(saved);
     }
 
+    public InventoryResponse reserveStock(
+            Long productId,Integer quantity
+    ){
 
+        Inventory inventory= inventoryRepository
+                .findByProductId(productId)
+                .orElseThrow(()->
+                    new InventoryNotFound(productId));
+        if(inventory.getQuantity()<quantity){
+            throw new InsufficientStockException(productId);
+        }
 
+        inventory.setQuantity(inventory.getQuantity()-quantity);
+
+        Inventory savedInventory=inventoryRepository.save(inventory);
+
+        return new InventoryResponse(
+                savedInventory.getId(),
+                savedInventory.getProductId(),
+                savedInventory.getQuantity()
+        );
+    }
 }
