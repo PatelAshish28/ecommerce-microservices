@@ -1,6 +1,6 @@
-package com.example.inventory_service.exception;
+package com.example.order_service.exception;
 
-import com.example.inventory_service.dto.ErrorResponse;
+import com.example.order_service.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,25 +11,6 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(ProductServiceUnavailableException.class)
-    public ResponseEntity<ErrorResponse> handleProductServiceUnavailable(
-            ProductServiceUnavailableException exception,
-            HttpServletRequest request
-    ){
-
-        ErrorResponse response=new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.SERVICE_UNAVAILABLE.value(),
-                "SERVICE_UNAVAILABLE",
-                exception.getMessage(),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(response);
-    }
 
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ErrorResponse> handleInsufficientStock(
@@ -49,4 +30,21 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    @ExceptionHandler(InventoryUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleInventoryUnavailable(
+            InventoryUnavailableException exception,
+            HttpServletRequest request) {
+
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "INVENTORY_SERVICE_UNAVAILABLE",
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(response);
+    }
 }
