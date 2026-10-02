@@ -1,5 +1,7 @@
 package com.ecommerce.product_service.controller;
 
+import com.ecommerce.product_service.client.InventoryClient;
+import com.ecommerce.product_service.dto.InventoryResponse;
 import com.ecommerce.product_service.dto.ProductRequest;
 import com.ecommerce.product_service.dto.ProductResponse;
 import com.ecommerce.product_service.service.ProductService;
@@ -16,6 +18,8 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+
+    private final InventoryClient inventoryClient;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -36,5 +40,12 @@ public class ProductController {
     public List<ProductResponse> getAllProducts() {
 
         return productService.getAllProducts();
+    }
+
+    @GetMapping("/inventory/{productId}")
+    public InventoryResponse getInventoryById(
+            @PathVariable Long productId
+    ){
+      return inventoryClient.getByProductId(productId);
     }
 }
