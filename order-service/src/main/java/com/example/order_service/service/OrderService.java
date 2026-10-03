@@ -1,6 +1,7 @@
 package com.example.order_service.service;
 
 import com.example.order_service.client.InventoryClient;
+import com.example.order_service.client.InventoryFeignClient;
 import com.example.order_service.client.ProductClient;
 import com.example.order_service.dto.OrderRequest;
 import com.example.order_service.dto.OrderResponse;
@@ -9,10 +10,13 @@ import com.example.order_service.entity.Order;
 import com.example.order_service.entity.OrderStatus;
 import com.example.order_service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -22,6 +26,8 @@ public class OrderService {
     private final ProductClient productClient;
 
     private final InventoryClient inventoryClient;
+
+    private final InventoryFeignClient inventoryFeignClient;
 
     public OrderResponse createOrder(OrderRequest request) {
 
@@ -55,4 +61,21 @@ public class OrderService {
         );
     }
 
+    public ResponseEntity<String> cancelOrder(Long orderId) {
+
+        log.info("Request Came in Cancel Order");
+        Order order=orderRepository.findById(orderId).orElseThrow(
+                ()->new RuntimeException("Order Not Found")
+        );
+
+        order.setStatus(OrderStatus.CANCELLED);
+        log.info("Order Status Got Cancelled");
+
+        Order updatedOrder=orderRepository.save(order);
+
+        inventoryFeignClient.updateStock(order.getProductId(),order.getQuantity());
+        log.info("Stock Updated");
+
+        return ResponseEntity.ok("Order Cancelled");
+    }
 }

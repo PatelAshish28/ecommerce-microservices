@@ -29,4 +29,11 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(orderService.createOrder(request));
     }
+
+    @PutMapping("/cancelOrder/{orderId}")
+    public ResponseEntity<String> cancelOrder(@PathVariable Long orderId){
+
+        return orderService.cancelOrder(orderId);
+    }
+
 }

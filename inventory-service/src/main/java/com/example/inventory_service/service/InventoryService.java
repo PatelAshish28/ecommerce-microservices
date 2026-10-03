@@ -9,6 +9,7 @@ import com.example.inventory_service.exception.InsufficientStockException;
 import com.example.inventory_service.exception.InventoryNotFound;
 import com.example.inventory_service.repository.InventoryRepository;
 import jakarta.ws.rs.NotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -78,5 +79,18 @@ public class InventoryService {
                 savedInventory.getProductId(),
                 savedInventory.getQuantity()
         );
+    }
+
+    public ResponseEntity<String> stockRefunded(Long productId, Integer quantity) {
+
+        Inventory inventory = inventoryRepository.findByProductId(productId).orElseThrow(
+                ()->new RuntimeException("inventory Not Found For Product :"+productId)
+        );
+
+        inventory.setQuantity(inventory.getQuantity()+quantity);
+
+        Inventory savedInventory= inventoryRepository.save(inventory);
+
+        return ResponseEntity.ok("Inventory Updated");
     }
 }

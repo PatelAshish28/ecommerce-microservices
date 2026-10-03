@@ -54,4 +54,12 @@ public class InventoryController {
         );
     }
 
+    @PutMapping("/{productId}/{quantity}")
+    public ResponseEntity<String> stockRefunded(
+            @PathVariable Long productId,
+            @PathVariable Integer quantity
+    ){
+        return inventoryService.stockRefunded(productId,quantity);
+    }
+
 }
