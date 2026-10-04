@@ -2,6 +2,7 @@ package com.example.order_service.controller;
 
 import com.example.order_service.dto.OrderRequest;
 import com.example.order_service.dto.OrderResponse;
+import com.example.order_service.entity.Order;
 import com.example.order_service.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,14 @@ public class OrderController {
         return "Fetched Orders";
     }
 
+    @GetMapping("/{orderId}")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId){
+       return orderService.findOrderById(orderId);
+    }
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
             @Valid @RequestBody OrderRequest request
             ){
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(orderService.createOrder(request));
     }

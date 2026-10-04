@@ -3,9 +3,11 @@ package com.example.order_service.service;
 import com.example.order_service.client.InventoryClient;
 import com.example.order_service.client.InventoryFeignClient;
 import com.example.order_service.client.ProductClient;
+import com.example.order_service.client.ShippingFeignClient;
 import com.example.order_service.dto.OrderRequest;
 import com.example.order_service.dto.OrderResponse;
 import com.example.order_service.dto.ProductResponse;
+import com.example.order_service.dto.ShippingResponse;
 import com.example.order_service.entity.Order;
 import com.example.order_service.entity.OrderStatus;
 import com.example.order_service.repository.OrderRepository;
@@ -29,18 +31,23 @@ public class OrderService {
 
     private final InventoryFeignClient inventoryFeignClient;
 
+    private final ShippingFeignClient shippingFeignClient;
+
     public OrderResponse createOrder(OrderRequest request) {
 
+        log.info("Request Came In Create Order Method");
         //1.Check Product
         ProductResponse product = productClient.getProductById(request.productId());
-
+        log.info("Product Found In DataBAse");
         //2.Calculate Total Price
         BigDecimal totalPrice = product.price()
                 .multiply(BigDecimal.valueOf(request.quantity()));
 
+        log.info("Calculated Total Price");
         //3.Reserve Inventory
         inventoryClient.reserveStock(request.productId(), request.quantity());
 
+        log.info("Stock Reserved");
         //4.Create Order
         Order order = Order.builder()
                 .productId(request.productId())
@@ -48,16 +55,22 @@ public class OrderService {
                 .totalPrice(totalPrice)
                 .status(OrderStatus.CREATED)
                 .build();
+        log.info("Order Created");
 
         //5.Save Order
         Order savedOrder = orderRepository.save(order);
+        log.info("Order Saved");
+        //6.Set Shipping
+        ResponseEntity<ShippingResponse> shippingResponse=shippingFeignClient.shippingOrder(order.getId());
+        log.info("Shipping Saved");
 
         return new OrderResponse(
                 savedOrder.getId(),
                 savedOrder.getProductId(),
                 savedOrder.getQuantity(),
                 savedOrder.getTotalPrice(),
-                savedOrder.getStatus()
+                savedOrder.getStatus(),
+                shippingResponse.getBody()
         );
     }
 
@@ -77,5 +90,16 @@ public class OrderService {
         log.info("Stock Updated");
 
         return ResponseEntity.ok("Order Cancelled");
+    }
+
+    public ResponseEntity<Order> findOrderById(Long orderId) {
+
+        Order order=orderRepository.findById(orderId).orElseThrow(
+                ()->new RuntimeException("Order Not Found")
+        );
+
+//        OrderResponse response=new OrderResponse(order.getId(),order.getProductId(),order.getQuantity(),order.getQuantity());
+
+        return ResponseEntity.status(200).body(order);
     }
 }
